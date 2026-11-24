@@ -1,11 +1,15 @@
 {% extends "base.html" %}
+{% load static %}
 {% block layout %}catalog-page{% endblock %}
 {% block content %}
 <section class="poster" aria-labelledby="poster-title">
+  <video id="poster-video" class="poster-video" muted loop playsinline preload="none"
+         aria-hidden="true" data-src="{% static 'events/night-loop.mp4' %}"></video>
   <div class="poster-copy">
     <h1 id="poster-title">Нічна<br><em>афіша.</em></h1>
     <a href="#catalog" class="poster-link">Переглянути події <span aria-hidden="true">↓</span></a>
   </div>
+  <button id="motion-toggle" class="media-control motion-toggle" type="button" hidden>Пауза відео</button>
 </section>
 <section id="catalog" aria-labelledby="catalog-title">
   <div class="catalog-head">
@@ -19,7 +23,7 @@
   {% for event in events %}
     <a class="listing" href="{{ event.get_absolute_url }}">
       <time datetime="{{ event.starts_at|date:'c' }}"><strong>{{ event.starts_at|date:"d" }}</strong>{{ event.starts_at|date:"M" }}</time>
-      <div><h3>{{ event.title }}</h3><small>{{ event.starts_at|date:"H:i" }} · Вільних місць: {{ event.remaining }} із {{ event.capacity }}</small></div>
+      <div><h3>{{ event.title }}</h3><small>{{ event.starts_at|date:"Y · H:i" }} · Вільних місць: {{ event.remaining }} із {{ event.capacity }}</small></div>
       <span class="arrow" aria-hidden="true">↗</span>
     </a>
   {% empty %}

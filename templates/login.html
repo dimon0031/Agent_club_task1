@@ -3,7 +3,9 @@
 {% block content %}
 <h1>Вхід</h1>
 <form method="post">{% csrf_token %}
+  <input type="hidden" name="next" value="{{ next }}">
   {{ form.as_div }}
   <button>Увійти</button>
 </form>
+<p>Уперше тут? <a href="{% url 'register' %}?next={{ next|urlencode:'' }}">Створити акаунт</a></p>
 {% endblock %}

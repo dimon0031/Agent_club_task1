@@ -2,6 +2,8 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import BaseUserCreationForm
 from django.db import IntegrityError, transaction
 from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
 
 from .models import User
@@ -18,8 +20,11 @@ class RegistrationForm(BaseUserCreationForm):
 
 @require_http_methods(["GET", "POST"])
 def register(request):
+    destination = request.POST.get("next", request.GET.get("next", ""))
+    if not url_has_allowed_host_and_scheme(destination, {request.get_host()}, require_https=request.is_secure()):
+        destination = reverse("home")
     if request.user.is_authenticated:
-        return redirect("home")
+        return redirect(destination)
     form = RegistrationForm(request.POST if request.method == "POST" else None)
     if request.method == "POST" and form.is_valid():
         try:
@@ -31,5 +36,5 @@ def register(request):
             form.add_error("email", "Адреса вже зареєстрована.")
         else:
             login(request, user)
-            return redirect("home")
-    return render(request, "register.html", {"form": form})
+            return redirect(destination)
+    return render(request, "register.html", {"form": form, "next": destination})

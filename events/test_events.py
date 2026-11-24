@@ -116,6 +116,17 @@ class EventTests(TestCase):
         self.assertRedirects(response, reverse("login") + "?next=" + reverse("event-create"))
         self.assertFalse(Event.objects.exists())
 
+    def test_expired_session_returns_to_invite_after_login(self):
+        self.client.post(reverse("event-create"), dict(self.payload, visibility="private"))
+        event = Event.objects.get()
+        self.client.logout()
+        page = self.client.post(reverse("invite-attend", args=[event.token]), {"action": "join"})
+        self.assertRedirects(page, reverse("login") + "?next=" + event.get_absolute_url())
+
+    def test_missing_invitation_has_way_back_to_catalog(self):
+        page = self.client.get(reverse("invite", args=[uuid.uuid4()]))
+        self.assertContains(page, "Перейти до афіші", status_code=404)
+
     def test_catalog_seats_after_creation_join_cancel_and_edit(self):
         self.client.post(reverse("event-create"), dict(self.payload, capacity=2))
         event = Event.objects.get()

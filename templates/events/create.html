@@ -6,7 +6,11 @@
 {% else %}<p>Ви автоматично займете одне з указаних місць.</p>{% endif %}
 <form method="post" enctype="multipart/form-data">
   {% csrf_token %}
+  {% if form.errors and request.FILES.image %}
+    <p role="alert">Після виправлення помилок виберіть файл обкладинки ще раз.</p>
+  {% endif %}
   {{ form.as_div }}
   <button>{% if editing %}Зберегти зміни{% else %}Створити подію{% endif %}</button>
+  <a href="{% if editing %}{{ return_url }}{% else %}{% url 'home' %}#catalog{% endif %}">Скасувати</a>
 </form>
 {% endblock %}

@@ -4,6 +4,23 @@ from .models import User
 
 
 class AccountTests(TestCase):
+    def test_registration_keeps_destination_after_validation_error(self):
+        target = reverse("event-create")
+        page = self.client.post(reverse("register"), {"next": target})
+        self.assertEqual(page.context["next"], target)
+        page = self.client.post(reverse("register"), {
+            "email": "new@example.com", "password1": "Summer-hills-38491",
+            "password2": "Summer-hills-38491", "next": target,
+        })
+        self.assertRedirects(page, target)
+
+    def test_registration_uses_home_for_external_destination(self):
+        response = self.client.post(reverse("register"), {
+            "email": "new@example.com", "password1": "Summer-hills-38491",
+            "password2": "Summer-hills-38491", "next": "https://example.org/",
+        })
+        self.assertRedirects(response, reverse("home"))
+
     def test_two_accounts(self):
         for email in ("one@example.com", "two@example.com"):
             client = Client()

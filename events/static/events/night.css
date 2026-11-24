@@ -35,6 +35,17 @@ h1,h2,h3 { margin: 0; font-family: Inter, "Arial Black", "Segoe UI", sans-serif;
 .poster, .detail-poster { isolation: isolate; position: relative; overflow: hidden; background: #431413; border-radius: 12px; }
 .poster::before, .detail-poster::before { content: ""; position: absolute; inset: 0; z-index: -2; background: url("night.webp") center / cover; }
 .poster-copy { padding: clamp(2rem,5vw,5rem); }
+.poster-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; opacity: 0; }
+.poster-video.ready { opacity: 1; }
+.media-control { background: #181517; border: 1px solid #756a6c; color: var(--text); font-size: .88rem; }
+.media-control[aria-pressed="true"] { border-color: var(--signal); }
+.motion-toggle { position: absolute; right: .75rem; bottom: .75rem; }
+.media-control[hidden] { display: none; }
+@media (max-width: 620px) {
+  .poster-video { object-position: 65% center; }
+  .motion-toggle { top: .6rem; right: .6rem; bottom: auto; }
+  .poster-copy { padding-top: 4.25rem; }
+}
 .poster h1 { font-size: clamp(5rem,9.6vw,9rem); font-weight: 900; letter-spacing: -.085em; line-height: .86; }
 .poster em { font-family: Georgia,serif; font-weight: 400; letter-spacing: -.08em; }
 .poster-link { margin-top: 2rem; color: #171213; background: var(--text); }
@@ -48,6 +59,9 @@ h1,h2,h3 { margin: 0; font-family: Inter, "Arial Black", "Segoe UI", sans-serif;
 .listing, .empty { border-top: 1px solid var(--line); padding: 1.4rem .5rem; }
 .listing:last-child, .empty { border-bottom: 1px solid var(--line); }
 .listing { text-decoration: none; }
+.listing > div { min-width: 0; }
+.detail-poster { grid-template-columns: minmax(0, 1fr); }
+textarea { resize: vertical; }
 .listing:hover { background: var(--surface); }
 .listing time { display: grid; justify-items: center; min-width: 4rem; text-transform: uppercase; color: var(--signal); font: bold .75rem/1.2 monospace; }
 .listing time strong { font-size: 2rem; }

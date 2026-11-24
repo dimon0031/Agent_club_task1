@@ -2,8 +2,9 @@
 {% block title %}Мій профіль · Тусовка{% endblock %}
 {% block content %}
 <h1>Мій профіль</h1>
+{% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}
 <h2>Я створив</h2>
-<ul>{% for event in created %}<li><a href="{{ event.get_absolute_url }}">{{ event.title }}</a> · {{ event.starts_at|date:"d.m.Y, H:i" }}</li>{% empty %}<li>Ви ще не створювали подій.</li>{% endfor %}</ul>
+<ul>{% for event in created %}<li><a href="{{ event.get_absolute_url }}">{{ event.title }}</a> · {{ event.starts_at|date:"d.m.Y, H:i" }} · {{ event.get_visibility_display }}</li>{% empty %}<li>Ви ще не створювали подій. <a href="{% url 'event-create' %}">Створити подію</a></li>{% endfor %}</ul>
 <h2>Я йду</h2>
-<ul>{% for event in attending %}<li><a href="{{ event.get_absolute_url }}">{{ event.title }}</a> · {{ event.starts_at|date:"d.m.Y, H:i" }}</li>{% empty %}<li>У вас немає записів на події.</li>{% endfor %}</ul>
+<ul>{% for event in attending %}<li><a href="{{ event.get_absolute_url }}">{{ event.title }}</a> · {{ event.starts_at|date:"d.m.Y, H:i" }}</li>{% empty %}<li>У вас немає записів на події. <a href="{% url 'home' %}#catalog">Переглянути афішу</a></li>{% endfor %}</ul>
 {% endblock %}

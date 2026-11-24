@@ -35,6 +35,7 @@ def create(request):
         with transaction.atomic():
             event.save()
             Attendance.objects.create(event=event, user=request.user)
+        messages.success(request, "Подію створено. Ви у списку учасників.")
         return redirect(event)
     return render(request, "events/create.html", {"form": form})
 
@@ -42,6 +43,7 @@ def create(request):
 @login_required
 def edit(request, pk):
     event = get_object_or_404(Event, pk=pk, author=request.user)
+    return_url = event.get_absolute_url()
     form = EventForm(instance=event)
     if request.method == "POST":
         form = EventForm(request.POST, request.FILES, instance=event)
@@ -58,8 +60,9 @@ def edit(request, pk):
                     transaction.set_rollback(True)
                     form.add_error("capacity", "Кількість місць менша за кількість учасників.")
                 else:
+                    messages.success(request, "Зміни збережено.")
                     return redirect(event)
-    return render(request, "events/create.html", {"form": form, "editing": True})
+    return render(request, "events/create.html", {"form": form, "editing": True, "return_url": return_url})
 
 
 def visible_event(pk=None, token=None):
@@ -83,13 +86,17 @@ def delete_event(request, pk):
     event = get_object_or_404(Event, pk=pk, author=request.user)
     if request.method == "POST":
         event.delete()
+        messages.success(request, "Подію видалено.")
         return redirect("profile")
     return render(request, "events/delete.html", {"event": event})
 
 
 @require_http_methods(["GET", "HEAD", "POST"])
 def detail(request, **lookup):
-    event = visible_event(**lookup)
+    try:
+        event = visible_event(**lookup)
+    except Http404:
+        return render(request, "404.html", status=404)
     form = CommentForm(request.POST if request.method == "POST" else None)
     if request.method == "POST":
         if not request.user.is_authenticated:
@@ -114,16 +121,19 @@ def detail(request, **lookup):
 
 
 @require_POST
-@login_required
 def attend(request, **lookup):
     event = visible_event(**lookup)
+    if not request.user.is_authenticated:
+        return redirect_to_login(event.get_absolute_url())
     action = request.POST.get("action")
     if action not in ("join", "cancel"):
         return HttpResponseBadRequest("Невідома дія.")
     if event.starts_at <= timezone.now():
         messages.info(request, "Подія вже почалася. Запис закрито.")
     elif action == "cancel":
-        event.attendances.filter(user=request.user).delete()
+        deleted, _ = event.attendances.filter(user=request.user).delete()
+        if deleted:
+            messages.success(request, "Участь скасовано. Місце звільнено.")
     else:
         # One SQLite write statement serializes competing reservations for the last place.
         with connection.cursor() as cursor:
