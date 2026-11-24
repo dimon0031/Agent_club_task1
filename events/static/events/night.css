@@ -1,7 +1,7 @@
 /* Night poster palette and type */
 :root {
   color-scheme: dark;
-  --ink: #101012;
+  --ink: #070707;
   --surface: #19191d;
   --line: #37373d;
   --text: #f7f4ee;
@@ -25,32 +25,55 @@ a:hover { color: var(--signal); }
 .nav-link, .quiet { font-weight: 600; text-decoration: none; }
 .account, small, .helptext { color: var(--muted); }
 .account { max-width: 22ch; overflow: hidden; text-overflow: ellipsis; }
-button, .pill, .poster-link { display: inline-flex; justify-content: center; align-items: center; gap: .7rem; min-height: 44px; padding: .65rem 1.15rem; border-radius: 6px; border: 0; background: var(--signal); color: #160c09; font: inherit; font-weight: 750; text-decoration: none; cursor: pointer; }
+button, .pill, .poster-link { display: inline-flex; justify-content: center; align-items: center; gap: .7rem; min-height: 44px; padding: .65rem 1.15rem; border-radius: 0; border: 0; background: var(--signal); color: #160c09; font: inherit; font-weight: 750; text-decoration: none; cursor: pointer; }
 button:hover, .pill:hover { background: #ff927e; color: #160c09; }
 .quiet { padding-inline: 0; background: transparent; color: var(--muted); }
 .quiet:hover { background: transparent; color: white; }
 :focus-visible { outline: 3px solid #ffe387; outline-offset: 4px; }
 h1,h2,h3 { margin: 0; font-family: Inter, "Arial Black", "Segoe UI", sans-serif; letter-spacing: -.055em; line-height: 1.02; overflow-wrap: anywhere; }
-.catalog-page { padding-block: 22px 5rem; }
-.poster, .detail-poster { isolation: isolate; position: relative; overflow: hidden; background: #431413; border-radius: 12px; }
+.catalog-page { width: 100%; }
+body:has(.catalog-page) { display: grid; grid-template-columns: minmax(0, 1fr); }
+body:has(.catalog-page) > header, .catalog-page { grid-area: 1 / 1; }
+body:has(.catalog-page) > header { z-index: 2; align-self: start; border: 0; background: linear-gradient(#070707ce, transparent); }
+.poster, .detail-poster { isolation: isolate; position: relative; overflow: hidden; background: #431413; }
+.poster { display: grid; align-items: end; min-height: max(35rem, 94svh); }
 .poster::before, .detail-poster::before { content: ""; position: absolute; inset: 0; z-index: -2; background: url("night.webp") center / cover; }
-.poster-copy { padding: clamp(2rem,5vw,5rem); }
+.poster::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(0deg, var(--ink) 0%, rgb(7 7 7 / .82) 9%, transparent 55%), linear-gradient(90deg, rgb(12 1 4 / .55), transparent 68%); }
+.poster-copy { position: relative; z-index: 1; padding-block: 11rem clamp(5rem, 12svh, 8rem); }
 .poster-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; opacity: 0; }
 .poster-video.ready { opacity: 1; }
-.media-control { background: #181517; border: 1px solid #756a6c; color: var(--text); font-size: .88rem; }
-.media-control[aria-pressed="true"] { border-color: var(--signal); }
-.motion-toggle { position: absolute; right: .75rem; bottom: .75rem; }
+.media-control, nav .pill { background: transparent; color: var(--text); padding-inline: 0; }
+.media-control { font-size: .88rem; }
+.media-control:hover, nav .pill:hover, .media-control[aria-pressed="true"] { background: transparent; color: var(--signal); }
+.motion-toggle { position: absolute; z-index: 1; right: 4%; bottom: 1.4rem; }
 .media-control[hidden] { display: none; }
 @media (max-width: 620px) {
-  .poster-video { object-position: 65% center; }
-  .motion-toggle { top: .6rem; right: .6rem; bottom: auto; }
-  .poster-copy { padding-top: 4.25rem; }
+  .poster-video { object-position: 77% center; }
 }
-.poster h1 { font-size: clamp(5rem,9.6vw,9rem); font-weight: 900; letter-spacing: -.085em; line-height: .86; }
+.poster h1 { font-size: clamp(3.55rem, 9.8vw, 9.5rem); font-weight: 850; letter-spacing: -.075em; line-height: .96; }
 .poster em { font-family: Georgia,serif; font-weight: 400; letter-spacing: -.08em; }
-.poster-link { margin-top: 2rem; color: #171213; background: var(--text); }
-.poster-link:hover { background: white; color: #171213; }
-#catalog { margin-top: 3rem; scroll-margin-top: 1.5rem; }
+.poster-link { margin-top: 1.6rem; padding-inline: 0; gap: 1.7rem; background: transparent; border-bottom: 2px solid var(--signal); color: var(--text); }
+.poster-link:hover { color: var(--signal); }
+#catalog {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  padding: clamp(2rem, 6vw, 5rem) max(4%, calc((100% - 1240px) / 2)) 5rem;
+  min-height: 98svh;
+}
+#catalog::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, var(--ink), transparent 24%, transparent 75%, var(--ink)),
+    linear-gradient(105deg, rgb(7 7 7 / .97) 12%, rgb(12 8 15 / .86) 56%, rgb(19 10 17 / .89)),
+    url("night.webp") 65% 58% / cover;
+}
+.playlist:not([hidden]) { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,18rem),1fr)); gap: 1.5rem; padding-block: 2rem; border-top: 1px solid var(--line); }
+.playlist iframe { width: 100%; min-height: 200px; aspect-ratio: 16 / 9; border: 0; }
 .catalog-head, .listing, .empty { display: flex; align-items: center; gap: 1.25rem; }
 .catalog-head { justify-content: space-between; margin-bottom: 1.4rem; flex-wrap: wrap; }
 .catalog-head h2 { font-size: clamp(2rem,4vw,3.4rem); }
@@ -69,12 +92,12 @@ textarea { resize: vertical; }
 .arrow { margin-left: auto; font-size: 1.5rem; }
 .empty { color: var(--muted); justify-content: space-between; flex-wrap: wrap; }
 .empty a { color: var(--text); }
-.interior { max-width: 780px; margin-block: clamp(2rem,5vw,5rem); padding: clamp(1.3rem,4vw,3.5rem); border: 1px solid var(--line); border-top: 3px solid var(--signal); border-radius: 8px; background: var(--surface); overflow-wrap: anywhere; }
+.interior { max-width: 780px; margin-block: clamp(2rem,5vw,5rem); overflow-wrap: anywhere; }
 .interior h1, .detail-poster h1 { font-size: clamp(2.5rem,6vw,5rem); }
 .interior form { margin-top: 1.5rem; }
 .interior form > div { margin-bottom: 1.25rem; }
 label { display: block; font-weight: 650; margin-bottom: .35rem; }
-input, textarea, select { width: 100%; min-width: 0; padding: .75rem; border-radius: 6px; border: 1px solid #59565c; background: var(--ink); color: var(--text); font: inherit; }
+input, textarea, select { width: 100%; min-width: 0; padding: .75rem; border-radius: 0; border: 1px solid #59565c; background: var(--ink); color: var(--text); font: inherit; }
 .helptext { font-size: .88rem; }
 .errorlist { color: #ffab9a; }
 .detail { margin-block: 1.5rem 5rem; }
@@ -100,12 +123,19 @@ input, textarea, select { width: 100%; min-width: 0; padding: .75rem; border-rad
   @keyframes beat { to { transform: scaleY(.45); } }
   @keyframes arrive { from { opacity: .3; transform: translateY(10px); } }
   @keyframes develop { from { transform: scale(1.04); } }
+  @supports (animation-timeline: view()) {
+    .catalog-head, .listing, .empty {
+      animation: from-dark linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+    @keyframes from-dark { from { opacity: .35; transform: translateY(1rem); } to { opacity: 1; transform: none; } }
+  }
 }
 @media (max-width: 620px) {
   nav { gap: .65rem; font-size: .88rem; }
   .account { display: none; }
-  .poster::before { background-position: 65% center; }
-  .poster-copy { background: linear-gradient(90deg,#160707aa,transparent); }
+  .poster::before { background-position: 77% center; }
   .search { width: 100%; }
   .search input { flex: 1; max-width: none; }
   .empty p { margin: 0; }

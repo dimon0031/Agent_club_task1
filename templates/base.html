@@ -13,9 +13,10 @@
 <header><nav class="wrap" aria-label="Головне меню">
   <a class="brand" href="{% url 'home' %}"><i class="wave" aria-hidden="true"><b></b><b></b><b></b><b></b></i>Тусовка</a>
   <a class="nav-link" href="{% url 'home' %}#catalog">Афіша</a>
-  <button class="media-control" id="music-toggle" type="button" aria-pressed="false" hidden>
+  <button class="media-control" id="music-toggle" type="button" aria-controls="playlist" aria-expanded="false" hidden>
     <span aria-hidden="true">♫</span> Музика <span id="music-state" aria-hidden="true">вимк.</span>
   </button>
+  <a id="player-link" href="#playlist" hidden>До програвача</a>
   {% if user.is_authenticated %}
     <a class="pill" href="{% url 'event-create' %}">Створити подію <span aria-hidden="true">↗</span></a>
     <span class="account">{{ user.email }}</span>
@@ -29,7 +30,19 @@
     {% endif %}
   {% endif %}
 </nav></header>
-<audio id="music" loop preload="none" src="{% static 'events/night-groove.mp3' %}"></audio>
 <main class="wrap {% block layout %}interior{% endblock %}">{% block content %}{% endblock %}</main>
+<section class="wrap playlist" id="playlist" aria-label="Музичний плейліст" hidden>
+  <div>
+    <h2>Плейліст ночі</h2>
+    <ol>
+      <li><a href="https://www.youtube.com/watch?v=xMV6l2y67rk" target="_blank" rel="noopener">The xx — Intro</a></li>
+      <li><a href="https://www.youtube.com/watch?v=S0Q4gqBUs7c" target="_blank" rel="noopener">Bonobo — Kerala</a></li>
+      <li><a href="https://www.youtube.com/watch?v=A7ZxRs45tTg" target="_blank" rel="noopener">Bicep — Glue</a></li>
+    </ol>
+    <p id="playlist-status" role="status"></p>
+    <button type="button" class="quiet" id="music-stop">Вимкнути музику</button>
+  </div>
+  <div id="player-slot"></div>
+</section>
 </body>
 </html>

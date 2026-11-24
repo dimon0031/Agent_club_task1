@@ -5,13 +5,13 @@
 <section class="poster" aria-labelledby="poster-title">
   <video id="poster-video" class="poster-video" muted loop playsinline preload="none"
          aria-hidden="true" data-src="{% static 'events/night-loop.mp4' %}"></video>
-  <div class="poster-copy">
-    <h1 id="poster-title">Нічна<br><em>афіша.</em></h1>
-    <a href="#catalog" class="poster-link">Переглянути події <span aria-hidden="true">↓</span></a>
+  <div class="poster-copy wrap">
+    <h1 id="poster-title">До зустрічі<br><em>на танцполі.</em></h1>
+    <a href="#catalog" class="poster-link">Перейти до подій <span aria-hidden="true">↓</span></a>
   </div>
   <button id="motion-toggle" class="media-control motion-toggle" type="button" hidden>Пауза відео</button>
 </section>
-<section id="catalog" aria-labelledby="catalog-title">
+<section id="catalog" class="wrap" aria-labelledby="catalog-title">
   <div class="catalog-head">
     <h2 id="catalog-title">Майбутні події</h2>
     <form method="get" action="{% url 'home' %}#catalog" class="search">
