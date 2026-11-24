@@ -31,6 +31,8 @@ class EventTests(TestCase):
         event = Event.objects.get()
         self.assertRedirects(response, event.get_absolute_url())
         self.assertEqual(event.author, self.author)
+        self.assertTrue(event.attendances.filter(user=self.author).exists())
+        self.assertContains(self.client.get(event.get_absolute_url()), "Вільних місць: 7 із 8")
         self.client.force_login(self.reader)
         self.assertContains(self.client.get(reverse("home"), {"q": "КЛУБ"}), event.title)
         self.assertNotContains(self.client.get(reverse("home"), {"q": "спорт"}), event.title)
@@ -75,6 +77,38 @@ class EventTests(TestCase):
                 page = self.client.post(reverse("event-create"), {**self.payload, field: value})
                 self.assertIn(field, page.context["form"].errors)
                 self.assertFalse(Event.objects.exists())
+
+    def test_author_edits_and_keeps_participants_and_cover(self):
+        self.client.post(reverse("event-create"), self.payload)
+        event = Event.objects.get()
+        event.attendances.create(user=self.reader)
+        Event.objects.filter(pk=event.pk).update(cover=b"original")
+        url = reverse("event-edit", args=[event.pk])
+        self.assertContains(self.client.get(event.get_absolute_url()), url)
+        changed = dict(self.payload, capacity=1, title="Нова назва", visibility="private")
+        page = self.client.post(url, changed)
+        self.assertIn("capacity", page.context["form"].errors)
+        event.refresh_from_db()
+        self.assertEqual(event.title, self.payload["title"])
+        changed["capacity"] = 2
+        response = self.client.post(url, changed)
+        event.refresh_from_db()
+        self.assertRedirects(response, reverse("invite", args=[event.token]))
+        self.assertEqual(event.cover, b"original")
+        self.assertEqual(event.title, changed["title"])
+        self.assertEqual(event.attendances.count(), 2)
+        self.assertEqual(self.client.get(reverse("event", args=[event.pk])).status_code, 404)
+
+    def test_only_author_can_edit(self):
+        self.client.post(reverse("event-create"), self.payload)
+        event = Event.objects.get()
+        url = reverse("event-edit", args=[event.pk])
+        self.client.force_login(self.reader)
+        self.assertNotContains(self.client.get(event.get_absolute_url()), url)
+        self.assertEqual(self.client.get(url).status_code, 404)
+        self.assertEqual(self.client.post(url, dict(self.payload, title="Інша")).status_code, 404)
+        event.refresh_from_db()
+        self.assertEqual(event.title, self.payload["title"])
 
     def test_anonymous_creation_requires_login(self):
         self.client.logout()

@@ -21,6 +21,8 @@ class EventForm(forms.ModelForm):
 
     def clean_starts_at(self):
         value = self.cleaned_data["starts_at"]
+        if self.instance.pk and self.instance.starts_at.replace(second=0, microsecond=0) == value:
+            return self.instance.starts_at
         if value <= timezone.now():
             raise forms.ValidationError("Виберіть дату в майбутньому.")
         return value

@@ -27,3 +27,13 @@ class Event(models.Model):
         if self.visibility == "private":
             return reverse("invite", args=[self.token])
         return reverse("event", args=[self.pk])
+
+
+class Attendance(models.Model):
+    event = models.ForeignKey(Event, related_name="attendances", on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["event", "user"], name="one_place_per_user"),
+        ]
