@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Створити подію · Тусовка{% endblock %}
+{% block content %}
+<h1>Створити подію</h1>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_div }}
+  <button>Створити подію</button>
+</form>
+{% endblock %}

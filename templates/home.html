@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Майбутні події</h1>
+<form method="get">
+  <label for="q">Пошук за назвою</label>
+  <input id="q" name="q" value="{{ query }}" type="search">
+  <button>Знайти</button>
+</form>
+{% for event in events %}
+<article>
+<h2><a href="{{ event.get_absolute_url }}">{{ event.title }}</a></h2>
+<p>{{ event.starts_at|date:"d.m.Y, H:i" }} · Місць: {{ event.capacity }}</p>
+</article>
+{% empty %}
+{% if query %}<p>За цим запитом подій не знайдено. <a href="{% url 'home' %}">Усі події</a></p>
+{% else %}<p>Поки що публічних подій немає.</p>{% endif %}
+{% endfor %}
+{% endblock %}

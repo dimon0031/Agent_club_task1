@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }} · Тусовка{% endblock %}
+{% block content %}
+<h1>{{ event.title }}</h1>
+<p>{{ event.get_visibility_display }} · {{ event.starts_at|date:"d.m.Y, H:i" }} (Київ) · Місць: {{ event.capacity }}</p>
+{% if event.cover %}<img src="{% if event.visibility == 'private' %}{% url 'invite-cover' event.token %}{% else %}{% url 'event-cover' event.pk %}{% endif %}" alt="Обкладинка події" style="max-width:100%;height:auto">{% endif %}
+{{ event.description|linebreaks }}
+{% if invite_url %}
+<label for="invite">Посилання-запрошення</label>
+<input id="invite" value="{{ invite_url }}" readonly onclick="this.select()">
+{% endif %}
+{% endblock %}
