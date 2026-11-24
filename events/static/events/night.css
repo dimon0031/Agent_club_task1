@@ -74,6 +74,7 @@ body:has(.catalog-page) > header { z-index: 2; align-self: start; border: 0; bac
 }
 .playlist:not([hidden]) { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,18rem),1fr)); gap: 1.5rem; padding-block: 2rem; border-top: 1px solid var(--line); }
 .playlist iframe { width: 100%; min-height: 200px; aspect-ratio: 16 / 9; border: 0; }
+.playlist button[hidden] { display: none; }
 .catalog-head, .listing, .empty { display: flex; align-items: center; gap: 1.25rem; }
 .catalog-head { justify-content: space-between; margin-bottom: 1.4rem; flex-wrap: wrap; }
 .catalog-head h2 { font-size: clamp(2rem,4vw,3.4rem); }

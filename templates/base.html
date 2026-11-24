@@ -40,6 +40,10 @@
       <li><a href="https://www.youtube.com/watch?v=A7ZxRs45tTg" target="_blank" rel="noopener">Bicep — Glue</a></li>
     </ol>
     <p id="playlist-status" role="status"></p>
+    <p><a id="external-playlist" href="https://www.youtube.com/watch_videos?video_ids=xMV6l2y67rk,S0Q4gqBUs7c,A7ZxRs45tTg" target="_blank" rel="noopener">Відкрити плейліст на YouTube ↗</a></p>
+    <button type="button" id="music-play" hidden>▶ Відтворити плейліст</button>
+    <button type="button" id="beat-play">Увімкнути локальний біт</button>
+    <audio id="local-beat" src="{% static 'events/night-groove.mp3' %}" loop preload="none"></audio>
     <button type="button" class="quiet" id="music-stop">Вимкнути музику</button>
   </div>
   <div id="player-slot"></div>
