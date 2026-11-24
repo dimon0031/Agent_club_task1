@@ -1,18 +1,32 @@
 {% extends "base.html" %}
+{% block layout %}catalog-page{% endblock %}
 {% block content %}
-<h1>Майбутні події</h1>
-<form method="get">
-  <label for="q">Пошук за назвою</label>
-  <input id="q" name="q" value="{{ query }}" type="search">
-  <button>Знайти</button>
-</form>
-{% for event in events %}
-<article>
-<h2><a href="{{ event.get_absolute_url }}">{{ event.title }}</a></h2>
-<p>{{ event.starts_at|date:"d.m.Y, H:i" }} · Місць: {{ event.capacity }}</p>
-</article>
-{% empty %}
-{% if query %}<p>За цим запитом подій не знайдено. <a href="{% url 'home' %}">Усі події</a></p>
-{% else %}<p>Поки що публічних подій немає.</p>{% endif %}
-{% endfor %}
+<section class="poster" aria-labelledby="poster-title">
+  <div class="poster-copy">
+    <h1 id="poster-title">Нічна<br><em>афіша.</em></h1>
+    <a href="#catalog" class="poster-link">Переглянути події <span aria-hidden="true">↓</span></a>
+  </div>
+</section>
+<section id="catalog" aria-labelledby="catalog-title">
+  <div class="catalog-head">
+    <h2 id="catalog-title">Майбутні події</h2>
+    <form method="get" action="{% url 'home' %}#catalog" class="search">
+      <label for="q" class="sr">Пошук за назвою</label>
+      <input id="q" name="q" value="{{ query }}" type="search" placeholder="Пошук за назвою">
+      <button>Знайти</button>
+    </form>
+  </div>
+  {% for event in events %}
+    <a class="listing" href="{{ event.get_absolute_url }}">
+      <time datetime="{{ event.starts_at|date:'c' }}"><strong>{{ event.starts_at|date:"d" }}</strong>{{ event.starts_at|date:"M" }}</time>
+      <div><h3>{{ event.title }}</h3><small>{{ event.starts_at|date:"H:i" }} · Вільних місць: {{ event.remaining }} із {{ event.capacity }}</small></div>
+      <span class="arrow" aria-hidden="true">↗</span>
+    </a>
+  {% empty %}
+    <div class="empty">
+      {% if query %}<p>За цим запитом подій не знайдено.</p><a href="{% url 'home' %}#catalog">Усі події ↗</a>
+      {% else %}<p>Поки що публічних подій немає.</p><a href="{% url 'event-create' %}">Створити подію ↗</a>{% endif %}
+    </div>
+  {% endfor %}
+</section>
 {% endblock %}

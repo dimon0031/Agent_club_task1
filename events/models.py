@@ -37,3 +37,10 @@ class Attendance(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["event", "user"], name="one_place_per_user"),
         ]
+
+
+class Comment(models.Model):
+    event = models.ForeignKey(Event, related_name="comments", on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    body = models.CharField("Коментар", max_length=1000)
+    created_at = models.DateTimeField(auto_now_add=True)

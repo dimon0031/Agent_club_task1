@@ -1,13 +1,15 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import redirect_to_login
 from django.db import connection, transaction
+from django.db.models import Count, F
 from django.http import HttpResponseBadRequest
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_http_methods, require_POST
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
-from .forms import EventForm
+from .forms import CommentForm, EventForm
 from .models import Attendance, Event
 
 
@@ -17,7 +19,9 @@ def catalog(request):
     if query:
         events = events.filter(search_title__contains=query.casefold())
     return render(request, "home.html", {
-        "events": events.defer("cover").order_by("starts_at", "pk"), "query": query,
+        "events": events.defer("cover").annotate(
+            remaining=F("capacity") - Count("attendances")
+        ).order_by("starts_at", "pk"), "query": query,
     })
 
 
@@ -64,9 +68,43 @@ def visible_event(pk=None, token=None):
     return get_object_or_404(Event, visibility="public", pk=pk)
 
 
+@login_required
+def profile(request):
+    events = Event.objects.defer("cover").order_by("-starts_at", "pk")
+    return render(request, "events/profile.html", {
+        "created": events.filter(author=request.user),
+        "attending": events.filter(attendances__user=request.user),
+    })
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def delete_event(request, pk):
+    event = get_object_or_404(Event, pk=pk, author=request.user)
+    if request.method == "POST":
+        event.delete()
+        return redirect("profile")
+    return render(request, "events/delete.html", {"event": event})
+
+
+@require_http_methods(["GET", "HEAD", "POST"])
 def detail(request, **lookup):
     event = visible_event(**lookup)
+    form = CommentForm(request.POST if request.method == "POST" else None)
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            return redirect_to_login(event.get_absolute_url())
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.author = request.user
+            comment.event = event
+            comment.save()
+            return redirect(event.get_absolute_url() + "#comments")
     return render(request, "events/detail.html", {
+        "comment_form": form,
+        "comments": event.comments.select_related("author").order_by("created_at", "pk"),
+        "participants": event.attendances.select_related("user").order_by("pk")
+        if request.user.pk == event.author_id else None,
         "remaining": event.capacity - event.attendances.count(),
         "joined": request.user.is_authenticated and event.attendances.filter(user=request.user).exists(),
         "closed": event.starts_at <= timezone.now(),

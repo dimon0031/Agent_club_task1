@@ -1,10 +1,14 @@
 {% extends "base.html" %}
 {% block title %}{{ event.title }} · Тусовка{% endblock %}
+{% block layout %}detail{% endblock %}
 {% block content %}
+<section class="detail-poster">
+{% if event.cover %}<img src="{% if event.visibility == 'private' %}{% url 'invite-cover' event.token %}{% else %}{% url 'event-cover' event.pk %}{% endif %}" alt="Обкладинка події">{% endif %}
 <h1>{{ event.title }}</h1>
-{% if user.pk == event.author_id %}<a href="{% url 'event-edit' event.pk %}">Редагувати подію</a>{% endif %}
 <p>{{ event.get_visibility_display }} · {{ event.starts_at|date:"d.m.Y, H:i" }} (Київ) · Місць: {{ event.capacity }}</p>
-{% if event.cover %}<img src="{% if event.visibility == 'private' %}{% url 'invite-cover' event.token %}{% else %}{% url 'event-cover' event.pk %}{% endif %}" alt="Обкладинка події" style="max-width:100%;height:auto">{% endif %}
+</section>
+<div class="detail-body">
+{% if user.pk == event.author_id %}<a href="{% url 'event-edit' event.pk %}">Редагувати подію</a>{% endif %}
 {{ event.description|linebreaks }}
 <p>Вільних місць: {{ remaining }} із {{ event.capacity }}</p>
 {% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}
@@ -28,4 +32,25 @@
 <label for="invite">Посилання-запрошення</label>
 <input id="invite" value="{{ invite_url }}" readonly onclick="this.select()">
 {% endif %}
+{% if user.pk == event.author_id %}
+<section>
+  <h2>Учасники</h2>
+  <ul>{% for entry in participants %}<li>{{ entry.user.email }}</li>{% empty %}<li>Поки що ніхто не записався.</li>{% endfor %}</ul>
+  <a href="{% url 'event-delete' event.pk %}">Видалити подію</a>
+</section>
+{% endif %}
+<section id="comments">
+  <h2>Коментарі</h2>
+  {% for comment in comments %}
+    <article><small>{% if comment.author_id == event.author_id %}Автор події{% elif comment.author_id == user.pk %}Ви{% else %}Користувач{% endif %} · {{ comment.created_at|date:"d.m.Y, H:i" }}</small>{{ comment.body|linebreaks }}</article>
+  {% empty %}<p>Коментарів поки немає.</p>{% endfor %}
+  {% if user.is_authenticated %}
+    <form method="post" action="{{ event.get_absolute_url }}#comments">{% csrf_token %}
+      {{ comment_form.as_div }}<button>Додати коментар</button>
+    </form>
+  {% else %}
+    <a href="{% url 'login' %}?next={{ request.path|urlencode }}">Увійти, щоб прокоментувати</a>
+  {% endif %}
+</section>
+</div>
 {% endblock %}

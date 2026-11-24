@@ -1,31 +1,27 @@
+{% load static %}
 <!doctype html>
 <html lang="uk">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% block title %}Тусовка{% endblock %}</title>
-<style>
-* {box-sizing:border-box}
-body {margin:0; color:#232d28; background:#faf8f3; font:1rem/1.6 Inter,system-ui,sans-serif}
-nav,main {max-width:58rem; margin:auto; padding:1rem}
-nav {display:flex; align-items:center; gap:1rem; flex-wrap:wrap; border-bottom:1px solid #cbcfc9}
-nav a:first-child {margin-right:auto; font-weight:bold}
-a {color:#24563e}
-main {padding-top:3rem}
-main form {max-width:30rem}
-main form>div {margin-bottom:1rem}
-label,input {display:block}
-input {width:100%; padding:.6rem; font:inherit}
-button {background:#24563e; color:white; border:0; border-radius:.4rem; padding:.55rem 1rem; font:inherit; cursor:pointer}
-textarea,select {max-width:100%; font:inherit}
-.errorlist {color:#942a20}
-</style></head>
-<body><nav>
-<a href="{% url 'home' %}">Тусовка</a>
-{% if user.is_authenticated %}
-<a href="{% url 'event-create' %}">Створити подію</a>
-<span>{{ user.email }}</span>
-<form method="post" action="{% url 'logout' %}">{% csrf_token %}<button>Вийти</button></form>
-{% else %}
-<a href="{% url 'login' %}">Увійти</a>
-<a href="{% url 'register' %}">Зареєструватися</a>
-{% endif %}
-</nav><main>{% block content %}{% endblock %}</main></body></html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101012">
+  <title>{% block title %}Тусовка{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'events/night.css' %}">
+</head>
+<body>
+<header><nav class="wrap" aria-label="Головне меню">
+  <a class="brand" href="{% url 'home' %}"><i class="wave" aria-hidden="true"><b></b><b></b><b></b><b></b></i>Тусовка</a>
+  <a class="nav-link" href="{% url 'home' %}#catalog">Афіша</a>
+  {% if user.is_authenticated %}
+    <a class="pill" href="{% url 'event-create' %}">Створити подію <span aria-hidden="true">↗</span></a>
+    <span class="account">{{ user.email }}</span>
+    <a class="nav-link" href="{% url 'profile' %}">Мій профіль</a>
+    <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="quiet">Вийти</button></form>
+  {% else %}
+    <a class="nav-link" href="{% url 'login' %}">Увійти</a>
+    <a class="pill" href="{% url 'register' %}">Зареєструватися <span aria-hidden="true">↗</span></a>
+  {% endif %}
+</nav></header>
+<main class="wrap {% block layout %}interior{% endblock %}">{% block content %}{% endblock %}</main>
+</body>
+</html>

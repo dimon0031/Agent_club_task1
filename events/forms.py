@@ -4,7 +4,14 @@ from django import forms
 from django.utils import timezone
 from PIL import Image, ImageOps
 
-from .models import Event
+from .models import Comment, Event
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ["body"]
+        widgets = {"body": forms.Textarea(attrs={"rows": 3})}
 
 
 class EventForm(forms.ModelForm):

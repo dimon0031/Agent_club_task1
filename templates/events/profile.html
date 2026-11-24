@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Мій профіль · Тусовка{% endblock %}
+{% block content %}
+<h1>Мій профіль</h1>
+<h2>Я створив</h2>
+<ul>{% for event in created %}<li><a href="{{ event.get_absolute_url }}">{{ event.title }}</a> · {{ event.starts_at|date:"d.m.Y, H:i" }}</li>{% empty %}<li>Ви ще не створювали подій.</li>{% endfor %}</ul>
+<h2>Я йду</h2>
+<ul>{% for event in attending %}<li><a href="{{ event.get_absolute_url }}">{{ event.title }}</a> · {{ event.starts_at|date:"d.m.Y, H:i" }}</li>{% empty %}<li>У вас немає записів на події.</li>{% endfor %}</ul>
+{% endblock %}
